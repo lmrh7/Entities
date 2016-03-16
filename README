@@ -1,0 +1,11 @@
+****Author: Laura M. Rodriguez
+****Purpose: Extract entities from reviews and captions from some businesses in YELP Dataset
+
+
+ It extracts the noun phrases from the text.
+ Then makes them singular. And finally, lemmatize them.
+*Still working on writing results to a file to later create a pickle object for later use
+
+ 25min I got to process 272 reviews from the Mon Ami Gabi restaurant in Vegas
+ Using Processor: i3 RAM: 4Gb
+It will run faster in a machine with more computing power and RAM
