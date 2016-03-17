@@ -1,10 +1,13 @@
 ****Author: Laura M. Rodriguez
 ****Purpose: Extract entities from reviews and captions from some businesses in YELP Dataset
 
+TagExample.py
+Extracts the noun phrases from the text.
+Then makes them singular. And finally, lemmatize them.
+*Still working on how to remove numbers and symbols from the text. They are not necessary.
+Saves results in a pickle file. Each list of entities has the id of the review it was extracted from
 
- It extracts the noun phrases from the text.
- Then makes them singular. And finally, lemmatize them.
-*Still working on writing results to a file to later create a pickle object for later use
+Opentags.py: script to exemplify how to open the file and use the objects
 
  25min I got to process 272 reviews from the Mon Ami Gabi restaurant in Vegas
  Using Processor: i3 RAM: 4Gb
