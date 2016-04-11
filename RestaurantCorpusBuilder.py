@@ -56,31 +56,32 @@ logging.root.level = logging.INFO  # ipython sometimes messes up the logging set
 print "Opening restaurant_reviews.pkl ..."
 restaurant_reviews = pd.read_pickle(r'C:\Users\LauraM\Desktop\restaurant_reviews.pkl')
 print len(restaurant_reviews)
-
-assert isinstance(restaurant_reviews, object)
-restaurant_reviews(1)
+print type(restaurant_reviews)
+print restaurant_reviews.keys()
+print "Trying to print only the reviews"
+reviews= restaurant_reviews['text'];
+print  reviews
 
 print "Open file reviewsTraining ..."
-f=open('reviewsTraining','wb')
-counter=1;
-maxRevs=400;
-print restaurant_review
+f=open('./data/reviewsTraining','wb')
+g=open('./data/reviewsTesting','wb')
+counter=0.0;
+totalRevs=len(reviews);
+maxRevs=.10*totalRevs
+print restaurant_reviews
 print "Trying to save the reviews for training"
-for restaurant in restaurant_reviews:
-    if(counter<=maxRev):
-        print "%d Training:"%counter
-        print restaurant['text']
-        pickle.dump(restaurant['text'],f)
-    elif(counter==maxRevs+1):
-        f.close();
-        print "Opening reviewsTesting"
-        f=open('reviewsTesting','wb')
+for review in reviews:
+    counter=counter+1;
+    if(counter<maxRevs):
+        print "%f%% Training:"%(counter/totalRevs*100)
+        pickle.dump(review,f)
     else:
-        print "%d Testing:"%counter
-        print restaurant['text']
-        pickle.dump(restaurant['text'],f)
+        if(counter==maxRevs):
+            f.close();
+            print "Opening reviewsTesting"
 
-
+        print "%f%% Testing:"%(counter/totalRevs*100)
+        pickle.dump(review,g)
 
 
 #dumpFilePath='./data/enwiki-latest-pages-articles.xml.bz2';

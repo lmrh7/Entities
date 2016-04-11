@@ -78,3 +78,5 @@ f.close()
 # what is the most common word in that first article?
 most_index, most_count = max(vector, key=lambda (word_index, count): count)
 print(id2word_wiki[most_index], most_count)
+
+gensim.corpora.MmCorpus.serialize('./data/wiki_bow.mm', wiki_corpus)
