@@ -1,7 +1,9 @@
 import pickle
 objs = []
-#f = open('mon_ami_revTags', 'rb')
-f = open('mon_ami_capTags', 'rb')
+#
+
+# f = open(''mon ami gabi_revTags', 'rb')
+f = open('fileName', 'rb')
 while 1:
     try:
         objs.append(pickle.load(f))
