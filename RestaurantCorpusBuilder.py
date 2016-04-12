@@ -63,8 +63,8 @@ reviews= restaurant_reviews['text'];
 print  reviews
 
 print "Open file reviewsTraining ..."
-f=open('./data/reviewsTraining','wb')
-g=open('./data/reviewsTesting','wb')
+f=open('./data/reviewsTraining.pkl','wb')
+g=open('./data/reviewsTesting.pkl','wb')
 counter=0.0;
 totalRevs=len(reviews);
 maxRevs=.10*totalRevs
