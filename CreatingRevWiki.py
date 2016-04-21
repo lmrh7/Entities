@@ -17,18 +17,39 @@ def head(stream, n=10):
 def tokenize(text):
     return [token for token in simple_preprocess(text) if token not in STOPWORDS]
 
-def iter_wiki(dump_file):
+def extract_reviews(dump_file):
+    f = open(dump_file, 'rb')
+    revs=[]
+    while 1:
+        try:
+            rev=pickle.load(f)
+            print rev
+            revs.append(rev)
+        except EOFError:
+            break
+    return revs
+
+#Do we need to make a new filter?
+#def filter_revs(rev):
+
+def iter_rev(dump_file):
     """Yield each article from the Wikipedia dump, as a `(title, tokens)` 2-tuple."""
-    ignore_namespaces = 'Wikipedia Category File Portal Template MediaWiki User Help Book Draft'.split()
-    for title, text, pageid in _extract_pages(smart_open(dump_file)):
+    print "inside iter_rev"
+    revs=[]
+    revs= extract_reviews(dump_file);
+    print "Reviews: %s"%revs
+    for text in revs:
+        #print "Unfiltered: %s"%text
         text = filter_wiki(text)
+        #print "filtered: %s"%text
         tokens = tokenize(text)
-        if len(tokens) < 50 or any(title.startswith(ns + ':') for ns in ignore_namespaces):
-            continue  # ignore short articles and various meta-articles
-        yield title, tokens
+        print tokens
+        if len(tokens) < 30 :#or any(title.startswith(ns + ':') for ns in ignore_namespaces):
+           continue  # ignore short articles and various meta-articles
+        yield tokens
 
 
-class WikiCorpus(object):
+class RevWikiCorpus(object):
     def __init__(self, dump_file, dictionary, clip_docs=None):
         """
         Parse the first `clip_docs` Wikipedia documents from file `dump_file`.
@@ -41,8 +62,7 @@ class WikiCorpus(object):
 
     def __iter__(self):
         self.titles = []
-        for title, tokens in itertools.islice(iter_wiki(self.dump_file), self.clip_docs):
-            self.titles.append(title)
+        for tokens in itertools.islice(iter_rev(self.dump_file), self.clip_docs):
             yield self.dictionary.doc2bow(tokens)
 
     def __len__(self):
@@ -56,7 +76,8 @@ dumpFilePath='./data/MonAmiGabiTraining.pkl';
 # only use simplewiki in this tutorial (fewer documents)
 # the full wiki dump is exactly the same format, but larger
 #stream = iter_wiki('./data/simplewiki-20140623-pages-articles.xml.bz2')
-doc_stream = (tokens for _, tokens in iter_rev(dumpFilePath))
+
+doc_stream = (tokens for tokens in iter_rev(dumpFilePath))
 
 id2word_wiki = gensim.corpora.Dictionary(doc_stream);
 print(id2word_wiki)
@@ -68,15 +89,19 @@ f.close()
 print(id2word_wiki)
 
 # create a stream of bag-of-words vectors
-wiki_corpus = WikiCorpus(dumpFilePath, id2word_wiki)
-vector = next(iter(wiki_corpus))
-print(vector)  # print the first vector in the stream
-f = open('wikiObjects', 'wb');
-pickle.dump(wiki_corpus, f)
+rev_wiki_corpus = RevWikiCorpus(dumpFilePath, id2word_wiki)
+
+f = open('revWikiObjects', 'wb');
+pickle.dump(rev_wiki_corpus, f)
 f.close()
 
-# what is the most common word in that first article?
-most_index, most_count = max(vector, key=lambda (word_index, count): count)
-print(id2word_wiki[most_index], most_count)
+gensim.corpora.MmCorpus.serialize('./data/reviews_wiki_bow.mm', rev_wiki_corpus)
+mm_corpus=rev_wiki_corpus
 
-gensim.corpora.MmCorpus.serialize('./data/wiki_bow.mm', wiki_corpus)
+clipped_corpus = gensim.utils.ClippedCorpus(mm_corpus, 4000)
+print 'ClippedCorpus'
+print clipped_corpus
+
+lda_model = gensim.models.LdaModel(clipped_corpus, num_topics=10, id2word=id2word_wiki, passes=4)
+
+gensim.corpora.MmCorpus.serialize('./data/reviews_wiki_lda.mm', lda_model[mm_corpus])
