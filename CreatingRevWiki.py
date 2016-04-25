@@ -2,6 +2,7 @@ import logging
 import itertools
 import sys
 import pickle
+import lda
 import numpy as np
 import gensim
 
@@ -23,7 +24,7 @@ def extract_reviews(dump_file):
     while 1:
         try:
             rev=pickle.load(f)
-            print rev
+            print( rev )
             revs.append(rev)
         except EOFError:
             break
@@ -34,16 +35,16 @@ def extract_reviews(dump_file):
 
 def iter_rev(dump_file):
     """Yield each article from the Wikipedia dump, as a `(title, tokens)` 2-tuple."""
-    print "inside iter_rev"
+    print ("inside iter_rev")
     revs=[]
     revs= extract_reviews(dump_file);
-    print "Reviews: %s"%revs
+    print ("Reviews: %s"%revs)
     for text in revs:
         #print "Unfiltered: %s"%text
         text = filter_wiki(text)
         #print "filtered: %s"%text
         tokens = tokenize(text)
-        print tokens
+        print (tokens)
         if len(tokens) < 30 :#or any(title.startswith(ns + ':') for ns in ignore_namespaces):
            continue  # ignore short articles and various meta-articles
         yield tokens
@@ -99,8 +100,8 @@ gensim.corpora.MmCorpus.serialize('./data/reviews_wiki_bow.mm', rev_wiki_corpus)
 mm_corpus=rev_wiki_corpus
 
 clipped_corpus = gensim.utils.ClippedCorpus(mm_corpus, 4000)
-print 'ClippedCorpus'
-print clipped_corpus
+print ('ClippedCorpus')
+print (clipped_corpus)
 
 lda_model = gensim.models.LdaModel(clipped_corpus, num_topics=10, id2word=id2word_wiki, passes=4)
 
